@@ -1,0 +1,8 @@
+import org.scalatest.Spec
+
+class ProjectsDAOTest extends Spec {
+  describe("A projects dao") {
+    it("should pop values in last-in-first-out order") (pending)
+    it("should throw NoSuchElementException if an empty stack is popped") (pending)
+  }
+}
