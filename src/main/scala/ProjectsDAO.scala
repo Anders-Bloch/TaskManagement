@@ -1,16 +1,16 @@
-import org.scala.xml._
+import scala.xml._
 
 class ProjectsDAO {
   
-  projects + "<projects></projects>"
-  
-  private val projects = new Document()
-  
+  private var allProjects : Elem = <projects></projects>
+ 
   def projects() : Node = {
-    "<projects></projects>"
+    allProjects
   }
   
   def addProject(name : String) = {
-     
+    println(allProjects ++ <project name="{name}" id="1" ></project>)
+    allProjects +: <project name={ name } id="1" ></project>
   }
+  
 }
