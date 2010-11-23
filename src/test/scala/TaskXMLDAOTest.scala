@@ -43,8 +43,9 @@ class TaskXMLDAOTest extends Spec {
     it("can add iteration to project") {
       val dao = new TaskXMLDAO()
       dao.addProject("test")
-      dao.addIterationTo(1,"First iteration",new Date()
-
+      dao.addIterationTo(1,"First iteration","01.01.2010","01.02.2010")
+	  val projects = XML.loadString(dao.getProjects())
+      assert((projects \ "project" \ "iteration").size === 1)
     }
   }
 }

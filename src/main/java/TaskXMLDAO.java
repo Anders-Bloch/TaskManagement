@@ -37,6 +37,23 @@ class TaskXMLDAO {
 		}
 	}
 	
+	public void addIterationTo(int projectId, String name, String startDate, String endDate) {
+		List projects = doc.getRootElement().getChildren();
+		for(Iterator it = projects.iterator(); it.hasNext();) {
+				Element project = (Element)it.next();
+				if(project.getAttributeValue("id").equals(projectId+"")) {
+					int numberOfIterations = project.getChildren("iteration").size();
+					numberOfIterations++;
+					Element iteration = new Element("iteration");
+					iteration.setAttribute("id", numberOfIterations+"");
+					iteration.setAttribute("name", name);
+					iteration.setAttribute("startDate", startDate);
+					iteration.setAttribute("endDate", endDate);
+					project.getChildren().add(iteration);
+				}
+		}
+	}
+	
 	private Element newState(String state, int numberOfStates) {
 		  Element newState = new Element("state");
 			newState.setAttribute("version", numberOfStates+"");
