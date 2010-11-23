@@ -1,0 +1,15 @@
+import org.scalatest.Spec
+
+class TaskXMLDAOTest extends Spec {
+  
+  describe("A task xml dao") {
+    it("should return a empty projects root element after first init") {
+      val resultString = <?xml version="1.0" encoding="UTF-8"?><projects />;
+      val dao = new TaskXMLDAO();
+      val projects = dao.getProjects();
+      println(projects)
+      println(resultString)
+      assert(projects == resultString)
+    }
+  }
+}

@@ -2,7 +2,7 @@ import org.scalatest.Spec
 
 class ProjectsDAOTest extends Spec {
   
-  describe("A projects dao") {
+/*  describe("A projects dao") {
     it("should return a empty projects root element after first init") {
       val dao = new ProjectsDAO();
       val projects = dao.projects();
@@ -15,4 +15,5 @@ class ProjectsDAOTest extends Spec {
       assert(dao.projects.toString() == """<projects><project name="First project" id="1"></project></projects>""")
     }
   }
+  */
 }

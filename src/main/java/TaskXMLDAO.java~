@@ -1,0 +1,18 @@
+import org.jdom.*;
+import org.jdom.output.*;
+
+class TaskXMLDAO {
+	private Document doc = new Document();
+	
+	public TaskXMLDAO() {
+		Element root = new Element("projects");
+		doc.setRootElement(root);
+	}
+	
+	public String getProjects() {
+		XMLOutputter outputter = new XMLOutputter();
+		return outputter.outputString(doc);
+	}
+	
+	
+}
