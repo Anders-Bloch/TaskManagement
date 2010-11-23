@@ -13,20 +13,38 @@ class TaskXMLDAOTest extends Spec {
       assert(projects === resultString)
     }
     
-    it("you can add new project") {
+    it("can add new project") {
       val resultString = <project id="1" name="test" ></project>
       val dao = new TaskXMLDAO();
-      dao.addProject(1,"test");
+      val id = dao.addProject("test");
       val projects = XML.loadString(dao.getProjects())
-      assert(projects \"project")
+      assert((projects \"project" \ "@name").toString === "test")
+      assert(id == 1)
     }
-    it("new projects has a init state of new") {
+    it("- new projects has a init state of new") {
       val state = "new";  
-      val resultString = <project id="1" name="test" ><state version="1">{state}</state></project>
       val dao = new TaskXMLDAO();
-      dao.addProject(1,"test");
+      dao.addProject("test");
       val projects = XML.loadString(dao.getProjects())
-      assert((projects \"project") === resultString)
+      assert((projects \ "project" \ "state").text === state)
+      assert((projects \ "project" \ "state" \ "@version").toString() === "1")
+    }
+    it("can update the state of a project") {
+      val state = "new"
+      val dao = new TaskXMLDAO() 
+      dao.addProject("test")
+      dao.setStateOnProject(1,"started")
+      val projects = XML.loadString(dao.getProjects())
+      assert((projects \ "project" \ "state").size === 2)
+      (projects \ "project" \ "state").foreach( s => { 
+        assert(s.text == "new" || s.text == "started") 
+      });
+    }
+    it("can add iteration to project") {
+      val dao = new TaskXMLDAO()
+      dao.addProject("test")
+      dao.addIterationTo(1,"First iteration",new Date()
+
     }
   }
 }
