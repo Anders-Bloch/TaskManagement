@@ -18,7 +18,15 @@ class TaskXMLDAOTest extends Spec {
       val dao = new TaskXMLDAO();
       dao.addProject(1,"test");
       val projects = XML.loadString(dao.getProjects())
-      assert(projects \"project" === resultString)
+      assert(projects \"project")
+    }
+    it("new projects has a init state of new") {
+      val state = "new";  
+      val resultString = <project id="1" name="test" ><state version="1">{state}</state></project>
+      val dao = new TaskXMLDAO();
+      dao.addProject(1,"test");
+      val projects = XML.loadString(dao.getProjects())
+      assert((projects \"project") === resultString)
     }
   }
 }
