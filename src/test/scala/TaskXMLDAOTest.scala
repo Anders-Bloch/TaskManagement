@@ -47,7 +47,41 @@ class TaskXMLDAOTest extends Spec {
 	  val projects = XML.loadString(dao.getProjects())
       assert((projects \ "project" \ "iteration").size === 1)
     }
-	it("cannot add iteration with overlapping or worng dates") (pending)
+	it("cannot add iteration with overlapping or worng dates") {
+	  val dao = new TaskXMLDAO()
+      dao.addProject("test")
+      dao.addIterationTo(1,"First iteration","01.01.2010","01.02.2010")
+	  try {
+		dao.addIterationTo(1,"First iteration","15.01.2010","15.02.2010")
+		fail("fail - you have added two overlapping iterations")
+	  } catch {
+		case ex: IllegalArgumentException => // :-) 
+	  }
+	  try {
+		dao.addIterationTo(1,"First iteration","15.12.2009","15.01.2010")
+		fail("fail - you have added two overlapping iterations 15.12.2009, 15.01.2010")
+	  } catch {
+		case ex: IllegalArgumentException => // :-) 
+	  }
+	  try {
+		dao.addIterationTo(1,"First iteration","15.12.2009","15.02.2010")
+		fail("fail - you have added two overlapping iterations 15.12.2009,15.02.2010")
+	  } catch {
+		case ex: IllegalArgumentException => // :-) 
+	  }
+	  try {
+		dao.addIterationTo(1,"First iteration","15.01.2010","17.01.2010")
+		fail("fail - you have added two overlapping iterations 15.01.2010,17.01.2010")
+	  } catch {
+		case ex: IllegalArgumentException => // :-) 
+	  }
+	  try {
+		dao.addIterationTo(1,"First iteration","30.05.2010","30.04.2010")
+		fail("fail - you have added two overlapping iterations 30.05.2010,30.04.2010")
+	  } catch {
+		case ex: IllegalArgumentException => // :-)
+	  }
+	}
 	it("can add task to iteration in specific project") (pending)
   }
 }
