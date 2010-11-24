@@ -47,5 +47,7 @@ class TaskXMLDAOTest extends Spec {
 	  val projects = XML.loadString(dao.getProjects())
       assert((projects \ "project" \ "iteration").size === 1)
     }
+	it("cannot add iteration with overlapping or worng dates") (pending)
+	it("can add task to iteration in specific project") (pending)
   }
 }
