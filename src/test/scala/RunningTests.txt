@@ -1,0 +1,4 @@
+scala -cp ../../../lib/scalatest-1.2.jar;../../../lib/jdom.jar;../../../lib/jaxen.jar org.scalatest.tools.Runner -p ". ../classes/ ../../../lib/" -g
+
+
+scala -cp ../../../lib/* org.scalatest.tools.Runner -p ". ../classes/ ../../../lib/" -g
