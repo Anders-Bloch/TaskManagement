@@ -17,7 +17,7 @@ class DomainValidatorTest extends Spec {
     }
 	
 	it("- it can check for overlapping iteration dates") {
-	  val doc = XML.loadFile("./src/test/scala/projects.xml")
+	  val doc = XML.loadFile("projects.xml")
 	  val validator = DomainValidator
 	  val project = for(n <- doc \ "project"; if (n \ "@id" text) == "1") yield n
 	  //Valid
