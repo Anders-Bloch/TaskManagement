@@ -1,0 +1,6 @@
+<projects>
+	<project id="1" name="First project2">
+		<state version="1" ></state>
+		<iteration id="1" name="first" startDate="01.01.2010" endDate="01.02.2010"></iteration>
+	</project>
+</projects>
