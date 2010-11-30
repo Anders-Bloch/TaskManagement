@@ -16,6 +16,13 @@ class DomainValidatorTest extends Spec {
 	  assert(!validator.datesInOrder("01.02.2010","01.01.2010"))
     }
 	
+	it(" can validate add project(projects can't have same names)") {
+      val validator = DomainValidator
+	  val doc = XML.loadFile("projects.xml")
+	  assert(validator.existsProjectWithName(doc, "First project2"))
+	  assert(!validator.existsProjectWithName(doc, "Second project"))
+    }
+	
 	it("- it can check for overlapping iteration dates") {
 	  val doc = XML.loadFile("projects.xml")
 	  val validator = DomainValidator

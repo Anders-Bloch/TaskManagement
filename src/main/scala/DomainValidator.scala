@@ -13,8 +13,13 @@ object DomainValidator {
     val df = new SimpleDateFormat("dd.MM.yyyy")
 	val start = df.parse(startDate)
 	val end = df.parse(endDate)
+	(project \ "iteration") exists(n => {
+	  val s = df.parse(n \ "@startDate" text)
+	  val e = df.parse(n \ "@endDate" text)
+	  !start.getTime() > e.getTime() || !end.getTime() < s.getTime()
+	})
+	
 	var conflict = false
-	println(project \ "iteration")
 	(project \ "iteration") foreach((n : Node) => {
 	  val s = df.parse(n \ "@startDate" text)
 	  val e = df.parse(n \ "@endDate" text)
@@ -25,6 +30,10 @@ object DomainValidator {
 	  }
 	})
 	conflict
+  }
+  
+  def existsProjectWithName(projects : NodeSeq, projectName: String) : Boolean = {
+	(projects \ "project").exists( n =>  (n \ "@name" text) == projectName)
   }
 
 }
