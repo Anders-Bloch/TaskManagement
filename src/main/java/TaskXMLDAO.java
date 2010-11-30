@@ -41,51 +41,91 @@ class TaskXMLDAO {
 		}
 	}
 	
-	public void addIterationTo(int projectId, String name, String startDate, String endDate) {
-		validateDates(projectId, startDate, endDate);
+	public int addIterationTo(int projectId, String name, String startDate, String endDate) {
 		List projects = doc.getRootElement().getChildren();
+		int iterationId = 0;
 		for(Iterator it = projects.iterator(); it.hasNext();) {
 			Element project = (Element)it.next();
 			if(project.getAttributeValue("id").equals(projectId+"")) {
 				int numberOfIterations = project.getChildren("iteration").size();
-				numberOfIterations++;
+				iterationId = numberOfIterations + 1;
 				Element iteration = new Element("iteration");
-				iteration.setAttribute("id", numberOfIterations+"");
+				iteration.setAttribute("id", iterationId+"");
 				iteration.setAttribute("name", name);
 				iteration.setAttribute("startDate", startDate);
 				iteration.setAttribute("endDate", endDate);
 				project.getChildren().add(iteration);
 			}
 		}
+		return iterationId;
 	}
 	
-	private void validateDates(int projectId, String startDate, String endDate) {
-		try {
-			Date startDateSubmitted = df.parse(startDate);
-			Date endDateSubmitted = df.parse(endDate);
-			if(startDateSubmitted.after(endDateSubmitted)) {
-				throw new IllegalArgumentException("");
-			}
-			String xpath = "/projects/project[@id='"+ projectId +"']/iteration";
-			List iterations = XPath.selectNodes(doc, xpath);
-			for(Iterator it = iterations.iterator(); it.hasNext();) {
-				Element iteration = (Element)it.next();
-				Date startDateCurrent = df.parse(iteration.getAttribute("startDate").getValue());
-				Date endDateCurrent = df.parse(iteration.getAttribute("endDate").getValue());
-				if(	endDateSubmitted.getTime() < startDateCurrent.getTime() && 
-					startDateSubmitted.getTime() > endDateCurrent.getTime()) {
-					//Dates valid
-				} else {
-					throw new IllegalArgumentException("");
+	public int addTaskToIteration(int projectId, int iterationId, String name) {
+		List projects = doc.getRootElement().getChildren();
+		int taskId = 0;
+		for(Iterator it = projects.iterator(); it.hasNext();) {
+			Element project = (Element)it.next();
+			if(project.getAttributeValue("id").equals(projectId+"")) {
+				for(Iterator it2 = project.getChildren("iteration").iterator(); it2.hasNext();) {
+					Element iteration = (Element)it2.next();
+					if(iteration.getAttributeValue("id").equals(iterationId+"")) {
+						int numberOftasks = iteration.getChildren("task").size();
+						taskId = numberOftasks + 1;
+						Element task = new Element("task");
+						task.setAttribute("id", taskId+"");
+						task.setAttribute("name", name);
+						Element newState = new Element("state");
+						newState.setAttribute("timestamp", System.currentTimeMillis()+"");
+						newState.addContent("new");
+						task.getChildren().add(newState);
+						iteration.getChildren().add(task);
+					}
 				}
 			}
-		} catch(ParseException e) {
-			throw new IllegalArgumentException("");
-		} catch(JDOMException e) {
-			throw new IllegalArgumentException(""); 
 		}
+		return taskId;
 	}
 	
+	public void setStateOnTask(int projectId, int iterationId, int taskId , String user, String state) {
+		Element e = new Element("state");
+		e.addContent(state);
+		addElementToTask(projectId, iterationId, taskId, user, e);
+	}
+	
+	public void addDescriptionToTask(int projectId, int iterationId, int taskId, String user, String description) {
+		Element e = new Element("description");
+		e.addContent(description);
+		addElementToTask(projectId, iterationId, taskId, user, e);
+	}
+	public void addCommentToTask(int projectId, int iterationId, int taskId, String user, String comment) {
+		Element e = new Element("comment");
+		e.addContent(comment);
+		addElementToTask(projectId, iterationId, taskId, user, e);
+	}
+	
+	private void addElementToTask(int projectId, int iterationId, int taskId, String user, Element e) {
+		List projects = doc.getRootElement().getChildren();
+		for(Iterator it = projects.iterator(); it.hasNext();) {
+			Element project = (Element)it.next();
+			if(project.getAttributeValue("id").equals(projectId+"")) {
+				for(Iterator it2 = project.getChildren("iteration").iterator(); it2.hasNext();) {
+					Element iteration = (Element)it2.next();
+					if(iteration.getAttributeValue("id").equals(iterationId+"")) {
+						for(Iterator it3 = iteration.getChildren("task").iterator(); it3.hasNext();) {
+							Element task = (Element)it3.next();
+							if(task.getAttributeValue("id").equals(taskId+"")) {
+								e.setAttribute("id", task.getChildren(e.getName()).size() + "");
+								e.setAttribute("timestamp", System.currentTimeMillis()+"");
+								e.setAttribute("user", user);
+								task.getChildren().add(e);
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 	private Element newState(String state, int numberOfStates) {
 		Element newState = new Element("state");
 		newState.setAttribute("version", numberOfStates+"");

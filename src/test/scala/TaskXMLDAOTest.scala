@@ -2,7 +2,7 @@ import org.scalatest.Spec
 import scala.xml._
 
 class TaskXMLDAOTest extends Spec {
-  
+  val user = "Anders"
   describe("A task xml dao") {
     it("should return a empty projects root element after first init") {
       val resultString = """<?xml version="1.0" encoding="UTF-8"?>
@@ -47,41 +47,56 @@ class TaskXMLDAOTest extends Spec {
 	  val projects = XML.loadString(dao.getProjects())
       assert((projects \ "project" \ "iteration").size === 1)
     }
-	it("cannot add iteration with overlapping or worng dates") {
+	it("can add task to iteration in specific project") {
 	  val dao = new TaskXMLDAO()
-      dao.addProject("test")
-      dao.addIterationTo(1,"First iteration","01.01.2010","01.02.2010")
-	  try {
-		dao.addIterationTo(1,"First iteration","15.01.2010","15.02.2010")
-		fail("fail - you have added two overlapping iterations")
-	  } catch {
-		case ex: IllegalArgumentException => // :-) 
-	  }
-	  try {
-		dao.addIterationTo(1,"First iteration","15.12.2009","15.01.2010")
-		fail("fail - you have added two overlapping iterations 15.12.2009, 15.01.2010")
-	  } catch {
-		case ex: IllegalArgumentException => // :-) 
-	  }
-	  try {
-		dao.addIterationTo(1,"First iteration","15.12.2009","15.02.2010")
-		fail("fail - you have added two overlapping iterations 15.12.2009,15.02.2010")
-	  } catch {
-		case ex: IllegalArgumentException => // :-) 
-	  }
-	  try {
-		dao.addIterationTo(1,"First iteration","15.01.2010","17.01.2010")
-		fail("fail - you have added two overlapping iterations 15.01.2010,17.01.2010")
-	  } catch {
-		case ex: IllegalArgumentException => // :-) 
-	  }
-	  try {
-		dao.addIterationTo(1,"First iteration","30.05.2010","30.04.2010")
-		fail("fail - you have added two overlapping iterations 30.05.2010,30.04.2010")
-	  } catch {
-		case ex: IllegalArgumentException => // :-)
-	  }
+	  val projectId = dao.addProject("test")
+      val iterationId = dao.addIterationTo(projectId,"First iteration","01.01.2010","01.02.2010")
+	  //var projects = XML.loadString(dao.getProjects())
+	  //assert((projects \ "project" \ "iteration" \ "task").size === 0)
+	  dao.addTaskToIteration(projectId, iterationId, "First test task")
+	  val projects = XML.loadString(dao.getProjects())
+	  assert((projects \ "project" \ "iteration" \ "task").size === 1)
 	}
-	it("can add task to iteration in specific project") (pending)
+	it("- new tasks has state new") {
+	  val dao = new TaskXMLDAO()
+	  val projectId = dao.addProject("test")
+      val iterationId = dao.addIterationTo(projectId,"First iteration","01.01.2010","01.02.2010")
+	  dao.addTaskToIteration(projectId, iterationId, "First test task")
+	  val projects = XML.loadString(dao.getProjects())
+	  assert((projects \ "project" \ "iteration" \ "task" \ "state").text === "new")
+	}
+	it("can change state on task") {
+	  val dao = new TaskXMLDAO()
+	  val projectId = dao.addProject("test")
+      val iterationId = dao.addIterationTo(projectId,"First iteration","01.01.2010","01.02.2010")
+	  val taskId = dao.addTaskToIteration(projectId, iterationId, "First test task")
+	  dao.setStateOnTask(projectId, iterationId, taskId, user, "waiting")
+	  val projects = XML.loadString(dao.getProjects())
+	  assert((projects \ "project" \ "iteration" \ "task" \ "state").size === 2)
+	}
+	it("can add description to task") {
+	  val d = "Description test"
+	  val dao = new TaskXMLDAO()
+	  val projectId = dao.addProject("test")
+      val iterationId = dao.addIterationTo(projectId,"First iteration","01.01.2010","01.02.2010")
+	  val taskId = dao.addTaskToIteration(projectId, iterationId, "First test task")
+	  dao.addDescriptionToTask(projectId, iterationId, taskId, user, d)
+	  val projects = XML.loadString(dao.getProjects())
+	  assert((projects \ "project" \ "iteration" \ "task" \ "description").text === d)
+	}
+	it("can add comment to task") {
+	  val d = "Comment test"
+	  val dao = new TaskXMLDAO()
+	  val projectId = dao.addProject("test")
+      val iterationId = dao.addIterationTo(projectId,"First iteration","01.01.2010","01.02.2010")
+	  val taskId = dao.addTaskToIteration(projectId, iterationId, "First test task")
+	  dao.addCommentToTask(projectId, iterationId, taskId, user, d)
+	  val projects = XML.loadString(dao.getProjects())
+	  assert((projects \ "project" \ "iteration" \ "task" \ "comment").text === d)
+	  assert((projects \ "project" \ "iteration" \ "task" \ "comment").size === 1)
+	  dao.addCommentToTask(projectId, iterationId, taskId, user, d)
+	  val projects2 = XML.loadString(dao.getProjects())
+	  assert((projects2 \ "project" \ "iteration" \ "task" \ "comment").size === 2)
+	}
   }
 }
