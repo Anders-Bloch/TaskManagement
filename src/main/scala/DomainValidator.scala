@@ -10,30 +10,23 @@ object DomainValidator {
   }
 	
   def isIterationDatesInConflict(project: NodeSeq, startDate : String, endDate: String) : Boolean = {
-    val df = new SimpleDateFormat("dd.MM.yyyy")
-	val start = df.parse(startDate)
-	val end = df.parse(endDate)
-	(project \ "iteration") exists(n => {
-	  val s = df.parse(n \ "@startDate" text)
-	  val e = df.parse(n \ "@endDate" text)
-	  !start.getTime() > e.getTime() || !end.getTime() < s.getTime()
-	})
-	
-	var conflict = false
-	(project \ "iteration") foreach((n : Node) => {
-	  val s = df.parse(n \ "@startDate" text)
-	  val e = df.parse(n \ "@endDate" text)
-	  if(start.getTime() > e.getTime() || end.getTime() < s.getTime()) {
-		//Dates valid
-	  } else {
-		conflict = true
-	  }
-	})
-	conflict
+  	val df = new SimpleDateFormat("dd.MM.yyyy")
+		val start = df.parse(startDate)
+		val end = df.parse(endDate)
+		var conflict = false
+		(project \ "iteration") foreach((n : Node) => {
+	  	val s = df.parse(n \ "@startDate" text)
+	  	val e = df.parse(n \ "@endDate" text)
+	  	if(start.getTime() > e.getTime() || end.getTime() < s.getTime()) {
+				//Dates valid
+	  	} else {
+				conflict = true
+	  	}
+		})
+		conflict
   }
   
   def existsProjectWithName(projects : NodeSeq, projectName: String) : Boolean = {
-	(projects \ "project").exists( n =>  (n \ "@name" text) == projectName)
+		(projects \ "project").exists( n =>  (n \ "@name" text) == projectName)
   }
-
 }

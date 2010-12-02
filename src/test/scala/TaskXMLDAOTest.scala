@@ -5,11 +5,9 @@ class TaskXMLDAOTest extends Spec {
   val user = "Anders"
   describe("A task xml dao") {
     it("should return a empty projects root element after first init") {
-      val resultString = """<?xml version="1.0" encoding="UTF-8"?>
-<projects />
-""";
+      val resultString = XML.loadString("<?xml version='1.0' encoding='UTF-8'?><projects />");
       val dao = new TaskXMLDAO();
-      val projects = dao.getProjects();
+      val projects = XML.loadString(dao.getProjects());
       assert(projects === resultString)
     }
     
@@ -44,7 +42,7 @@ class TaskXMLDAOTest extends Spec {
       val dao = new TaskXMLDAO()
       dao.addProject("test")
       dao.addIterationTo(1,"First iteration","01.01.2010","01.02.2010")
-	  val projects = XML.loadString(dao.getProjects())
+	  	val projects = XML.loadString(dao.getProjects())
       assert((projects \ "project" \ "iteration").size === 1)
     }
 	it("can add task to iteration in specific project") {
